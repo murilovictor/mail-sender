@@ -1,4 +1,5 @@
 import awsSesMail from "aws-ses-mail";
+import { ResponseMessage } from "../model/ResponseMessage";
 
 class SendMessageService {
   private client: awsSesMail;
@@ -13,18 +14,40 @@ class SendMessageService {
     });
   }
 
-  send(to: string, subject: string, template: string, params: any) {
+  async send(to: string, subject: string, template: string, params: any): Promise<ResponseMessage> {
     console.log("Enviando...", to, params);
-    this.client.sendEmailByHtml(
-      {
-        from: process.env.EMAIL_SENDER,
-        to: to,
-        subject: subject,
-        template: `./src/resources/templates/${template}`,
-        templateArgs: params,
-      },
-      () => console.log("Enviado com sucesso!")
-    );
+
+    const options = {
+      from: process.env.EMAIL_SENDER,
+      to: to,
+      subject: subject,
+      template: `./src/resources/templates/${template}`,
+      templateArgs: params,
+    };
+
+    return new Promise((resolve, reject) => {
+      this.client.sendEmailByHtml(options, function (err, data) {
+        if (err) {
+          reject(
+            new ResponseMessage(
+              err.success,
+              err.result.message,
+              err.result.statusCode,
+              'Não foi possível enviar o email, Tente novamente.'
+            )
+          );
+        } else {
+          resolve(
+            new ResponseMessage(
+              data.success,
+              data.result.message,
+              data.result.statusCode | 200,
+              'E-mail de recuperação enviado. Verifique seu E-mail.'
+            )
+          );
+        }
+      });
+    });
   }
 }
 

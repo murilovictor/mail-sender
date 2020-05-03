@@ -1,26 +1,28 @@
 import SendMessageService from "../services/SendMessageService";
 
 class EmailController {
+
   public async forgotPassword(req: Request, res: Response) {
     const { to, params } = req.body;
 
-    try {
+    const retorno = await SendMessageService.send(
+      to,
+      "ClickFest - Recuperação de senha",
+      "forgot-password.html",
+      params
+    )
+      .then((response) => {
+        console.log(`Enviado com sucesso!`)
+        return response;
+      })
+      .catch((err) => {
+        console.error(`Error when sending forgot-password to ${to} => ${err.message}`)
+        return err;
+      });
 
-      SendMessageService.send(
-        to,
-        "ClickFest - Recuperação de senha",
-        "forgot-password.html",
-        params
-      );
-
-      return res.status(200).json({ message: "Enviado com sucesso!" });
-    } catch (error) {
-      console.log(error);
-      return res
-        .status(400)
-        .json({ error: "Error on forgot password, try again." });
-    }
+    return res.status(200).json(retorno);
   }
+  
 }
 
 export default new EmailController();

@@ -1,9 +1,5 @@
 import express from 'express'
 import routes from './routes'
-import SendMessageService from './app/services/SendMessageService'
-
-
-
 class App {
     public express: express.Application
 
