@@ -28,6 +28,7 @@ class SendMessageService {
     return new Promise((resolve, reject) => {
       this.client.sendEmailByHtml(options, function (err, data) {
         if (err) {
+          console.error(err.result.message)
           reject(
             new ResponseMessage(
               err.success,
