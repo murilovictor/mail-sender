@@ -7,7 +7,7 @@ class EmailController {
 
     const retorno = await SendMessageService.send(
       to,
-      "ClickFest - Recuperação de senha",
+      "[ClickFest] - Redefinir Senha!",
       "forgot-password.html",
       params
     )
